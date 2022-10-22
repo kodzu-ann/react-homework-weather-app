@@ -1,47 +1,66 @@
-import React, { useLayoutEffect } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import "./Weather.css";
 
-export default function Weather() {
-  return (
-    <div className="Weather">
-      <form>
-        <div className="input-group rounded p-2">
-          <input
-            type="search"
-            className="form-control rounded"
-            placeholder="Search for a city"
-            autoFocus="on"
-          />
-          <button type="button" className="btn btn-outline-primary">
-            search
-          </button>
-        </div>
-      </form>
-
-      <h1> Lisbon </h1>
-      <ul>
-        <li> Sunday 16: 06 </li>
-        <li> Mostly cloudy </li>
-      </ul>
-
-      <div className="row">
-        <div className="col-6 p-3">
-          <div>
-            <img
-              src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
-              alt="mostly cloudy"
+export default function Weather(props) {
+  let [weatherData, setWeatherData] = useState({ ready: false });
+  function handleResponse(response) {
+    setWeatherData({
+      ready: true,
+      city: response.data.city,
+      description: response.data.condition.description,
+      temperature: Math.round(response.data.temperature.current),
+      wind: Math.round(response.data.wind.speed),
+      humidity: response.data.temperature.humidity,
+      icon: response.data.condition.icon_url,
+      date: "Sunday 16: 06",
+    });
+  }
+  if (weatherData.ready) {
+    return (
+      <div className="Weather">
+        <form>
+          <div className="input-group rounded p-2">
+            <input
+              type="search"
+              className="form-control rounded"
+              placeholder="Search for a city"
+              autoFocus="on"
             />
-            <span className="temperature"> 6</span>
-            <span className="unit">°C</span>
+            <button type="button" className="btn btn-outline-primary">
+              search
+            </button>
+          </div>
+        </form>
+
+        <h1> {weatherData.city} </h1>
+        <ul>
+          <li> {weatherData.date} </li>
+          <li className="text-capitalize"> {weatherData.description} </li>
+        </ul>
+
+        <div className="row">
+          <div className="col-6 p-3">
+            <div>
+              <img src={weatherData.icon} alt={weatherData.description} />
+              <span className="temperature"> {weatherData.temperature} </span>
+              <span className="unit">°C</span>
+            </div>
+          </div>
+          <div className="col-6 weather-info">
+            <ul>
+              <li> Humidity: {weatherData.humidity} %</li>
+              <li> Wind: {weatherData.wind} km/h </li>
+            </ul>
           </div>
         </div>
-        <div className="col-6 weather-info">
-          <ul>
-            <li> Humidity:66 </li>
-            <li> Wind: 5 km/h </li>
-          </ul>
-        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    let key = "7ef1et3obcaa30b2b586b1bcca3d3f4d";
+    let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${props.defaultCity}&key=${key}&units=metric`;
+    axios.get(apiUrl).then(handleResponse);
+
+    return "Loading ... ";
+  }
 }

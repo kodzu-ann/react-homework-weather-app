@@ -6,7 +6,7 @@ export default function App() {
   return (
     <div className="App container p-2">
       <h1> Weather app </h1>
-      <Weather />
+      <Weather defaultCity="Warsaw" />
       <footer>
         <a
           href="https://github.com/kodzu-ann/react-homework-weather-app"
